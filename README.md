@@ -2,6 +2,10 @@
 
 Ray tracer.
 
+## Done
+
+
+
 ## TODO
 
 Various things to try in no particular order:
@@ -16,6 +20,7 @@ Various things to try in no particular order:
 - Textures
 - Store texture pixels as a Hilbert curve
 - SIMD
+- Ray marching
 - Scene loader
 - BRDFs:
   - Microfacet
@@ -37,6 +42,8 @@ Various things to try in no particular order:
 - Russian roulette
 - Blue noise
 - Normal maps
+- Displacement mapping
+- Subdivision surface
 - Subsurface scattering
 - Different samplers
 - Denoising (OIDN?)
@@ -48,3 +55,4 @@ Various things to try in no particular order:
 - Light sampling
 - GPU port, nvcc doesn't support rust though :(
 - Interactive window
+- 

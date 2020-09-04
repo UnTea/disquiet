@@ -1,3 +1,4 @@
+use crate::camera::*;
 use crate::color::*;
 use crate::image::*;
 use crate::material::*;
@@ -8,17 +9,19 @@ pub struct Scene {
     shapes: Vec<Box<dyn Shape>>,
     pub world_color: Color3,
     pub sky: Option<Image>,
+    pub camera: Camera,
 }
 
 pub type MaterialId = usize;
 
 impl Scene {
-    pub fn new() -> Self {
+    pub fn new(camera: Camera) -> Self {
         Self {
             materials: Vec::new(),
             shapes: Vec::new(),
-            world_color: Color3::new(0.5, 0.5, 0.5),
+            world_color: Color3::new(0.0, 0.0, 0.0),
             sky: None,
+            camera,
         }
     }
 

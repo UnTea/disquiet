@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 
 mod accelerator;
+mod camera;
 mod color;
 mod error;
 mod image;
@@ -16,6 +17,7 @@ mod shape;
 use std::fs::File;
 
 use crate::accelerator::*;
+use crate::camera::*;
 use crate::color::*;
 use crate::image::*;
 use crate::integrator::*;
@@ -27,9 +29,17 @@ use crate::shape::*;
 use crossbeam_deque::{Injector, Steal};
 
 fn build_scene() -> Scene {
-    let mut scene = Scene::new();
+    let origin = Vector3::new(-1.5, 9.0, 0.1);
+    let at = Vector3::new(-1.5, 0.0, 0.0);
+    let up = Vector3::new(0.0, 1.0, 0.0);
+    let fov = 90.0;
+    let aspect_ratio = 2.0 / 1.0;
+    let camera = Camera::look_at(origin, at, up, fov, aspect_ratio);
 
-    scene.sky = Some(io::load("spiaggia_di_mondello_4k.hdr").unwrap());
+    let mut scene = Scene::new(camera);
+
+    // scene.sky = Some(io::load("spiaggia_di_mondello_4k.hdr").unwrap());
+    // scene.sky = Some(io::load("blaubeuren_night_4k.hdr").unwrap());
     // scene.sky = Some(io::load("blaubeuren_night_4k.hdr").unwrap());
 
     let red = scene.add_material(Lambertian {
@@ -74,6 +84,27 @@ fn build_scene() -> Scene {
         material: white,
     });
 
+    scene.add_shape(Sphere {
+        center: Vector3::new(-3.0, 2.0, -3.0),
+        radius: 0.5,
+        material: light,
+    });
+    scene.add_shape(Sphere {
+        center: Vector3::new(3.0, 2.0, -3.0),
+        radius: 0.5,
+        material: light,
+    });
+    scene.add_shape(Sphere {
+        center: Vector3::new(3.0, 2.0, 3.0),
+        radius: 0.5,
+        material: light,
+    });
+    scene.add_shape(Sphere {
+        center: Vector3::new(-3.0, 2.0, 3.0),
+        radius: 0.5,
+        material: light,
+    });
+/*
     let mut triangle = Triangle {
         a: Vector3::new(2.4, 2.0, -0.1),
         b: Vector3::new(2.4, 1.5, 0.4),
@@ -84,7 +115,7 @@ fn build_scene() -> Scene {
         material: yellow,
     };
     // triangle.recalculate_normals();
-    scene.add_shape(triangle);
+    scene.add_shape(triangle);*/
 
     scene
 }
@@ -121,9 +152,6 @@ impl<I: Integrator> Renderer<I> {
     }
 
     unsafe fn render_tile<A: Accelerator>(&mut self, input: &RendererInput<A>, image: &RgbaImage, tile: TileInfo) {
-        let origin = Vector3::new(0.0, 0.0, -2.0);
-        let top_left = Vector3::new(-2.0, 1.0, 1.0);
-
         for y in tile.y..tile.y+tile.height {
             for x in tile.x..tile.x+tile.width {
                 let width = image.width() as Float;
@@ -138,12 +166,7 @@ impl<I: Integrator> Renderer<I> {
                     let u = (x as Float + jitter_u) / width;
                     let v = (y as Float + jitter_v) / height;
 
-                    let direction = Vector3::new(top_left.x + 4.0 * u, top_left.y - 2.0 * v, 1.0);
-                    let ray = Ray {
-                        origin,
-                        direction: direction.normalize(),
-                    };
-
+                    let ray = input.scene.camera.get_ray(u, v, &mut self.rng);
                     color = color + self.integrator.integrate(input.scene, &ray, input.accel).color;
                 }
 
