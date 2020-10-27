@@ -7,17 +7,6 @@ use std::fs::File;
 use std::path::Path;
 use crate::color::Color3;
 
-/*
-
-#?RADIANCE
-# Made with Adobe Photoshop
-GAMMA=1
-PRIMARIES=0 0 0 0 0 0 0 0
-FORMAT=32-bit_rle_rgbe
-
--Y 1024 +X 2048
- */
-
 struct Header {
     width: usize,
     height: usize,
@@ -135,15 +124,19 @@ fn unpack_rle_scanline<R: BufRead>(reader: &mut R, y: usize, image: &mut Image) 
     Ok(())
 }
 
-pub fn parse<P: AsRef<Path>>(p: P) -> Result<Image> {
-    let mut reader = BufReader::new(File::open(p)?);
-    let header = Header::parse(&mut reader)?;
+pub struct Hdr;
 
-    let mut image = Image::new(header.width, header.height);
+impl Hdr {
+    pub fn load<P: AsRef<Path>>(p: P) -> Result<Image> {
+        let mut reader = BufReader::new(File::open(p)?);
+        let header = Header::parse(&mut reader)?;
 
-    for y in (0..header.height).rev() {
-        unpack_rle_scanline(&mut reader, y, &mut image)?;
+        let mut image = Image::new(header.width, header.height);
+
+        for y in (0..header.height).rev() {
+            unpack_rle_scanline(&mut reader, y, &mut image)?;
+        }
+
+        Ok(image)
     }
-
-    Ok(image)
 }

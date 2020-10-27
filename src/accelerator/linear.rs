@@ -3,11 +3,11 @@ use crate::math::*;
 use crate::scene::*;
 use crate::shape::{Shape, Hit};
 
-pub struct LinearAccelerator<'a> {
+pub struct ShapeVec<'a> {
     shapes: Vec<&'a dyn Shape>,
 }
 
-impl<'a> LinearAccelerator<'a> {
+impl<'a> ShapeVec<'a> {
     pub fn new(scene: &'a Scene) -> Self {
         Self {
             shapes: scene.shapes().collect(),
@@ -15,7 +15,7 @@ impl<'a> LinearAccelerator<'a> {
     }
 }
 
-impl Accelerator for LinearAccelerator<'_> {
+impl Accelerator for ShapeVec<'_> {
     fn trace(&self, ray: &Ray) -> Option<Hit> {
         self.shapes.iter()
             .fold((None, MAX), |(closest_hit, t), shape| {

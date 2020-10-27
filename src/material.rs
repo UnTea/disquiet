@@ -20,12 +20,6 @@ impl Material for Lambertian {
     }
 
     fn next_ray_direction(&self, n: Vector3, wo: Vector3, rng: &mut RandomGenerator) -> Vector3 {
-        /*let mut wi = rng.unit_sphere();
-        if n.dot(wi) < 0.0 {
-            wi = -wi;
-        }
-        wi*/
-
         let u = rng.range(0.0, 1.0);
         let v = rng.range(0.0, 1.0);
 
@@ -35,9 +29,6 @@ impl Material for Lambertian {
         let sphere_point = Vector3::new(f * phi.cos(), f * phi.sin(), cos_theta);
 
         let result = (n + sphere_point).normalize();
-        if result.x.is_nan() || result.y.is_nan() || result.z.is_nan() {
-            println!("Nan");
-        }
 
         result
     }
@@ -48,7 +39,6 @@ impl Material for Lambertian {
 
     fn pdf(&self, n: Vector3, wi: Vector3) -> Float {
         n.dot(wi) / PI
-        // 1.0 / (2.0 * PI)
     }
 
     fn emittance(&self) -> Color3 {

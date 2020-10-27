@@ -1,5 +1,6 @@
 use crate::math::*;
 
+#[derive(Clone, Default)]
 pub struct Aabb {
     min: Vector3,
     max: Vector3,
@@ -31,7 +32,7 @@ impl Aabb {
         self.max
     }
 
-    pub fn union(&self, rhs: Aabb) -> Aabb {
+    pub fn extend(&self, rhs: Aabb) -> Aabb {
         let min = Vector3 {
             x: min(self.min.x, rhs.min.x),
             y: min(self.min.y, rhs.min.y),

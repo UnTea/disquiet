@@ -2,7 +2,7 @@ use crate::math::*;
 use crate::random::*;
 use std::ops::{Add, Sub, Mul, Div, Index, IndexMut, Neg};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct Vector3 {
     pub x: Float,
     pub y: Float,

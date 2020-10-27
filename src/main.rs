@@ -21,6 +21,7 @@ use crate::camera::*;
 use crate::color::*;
 use crate::image::*;
 use crate::integrator::*;
+use crate::io::*;
 use crate::material::*;
 use crate::math::*;
 use crate::random::*;
@@ -38,9 +39,9 @@ fn build_scene() -> Scene {
 
     let mut scene = Scene::new(camera);
 
-    // scene.sky = Some(io::load("spiaggia_di_mondello_4k.hdr").unwrap());
-    // scene.sky = Some(io::load("blaubeuren_night_4k.hdr").unwrap());
-    // scene.sky = Some(io::load("blaubeuren_night_4k.hdr").unwrap());
+    scene.sky = Some(Hdr::load("spiaggia_di_mondello_4k.hdr").unwrap());
+    // scene.sky = Some(load("blaubeuren_night_4k.hdr").unwrap());
+    // scene.sky = Some(load("blaubeuren_night_4k.hdr").unwrap());
 
     let red = scene.add_material(Lambertian {
         color: Color3::new(1.0, 0.1, 0.1),
@@ -52,10 +53,6 @@ fn build_scene() -> Scene {
 
     let white = scene.add_material(Lambertian {
         color: Color3::new(1.0, 1.0, 1.0),
-    });
-
-    let yellow = scene.add_material(Lambertian {
-        color: Color3::new(0.9, 0.7, 0.1),
     });
 
     let light = scene.add_material(LightEmitter {
@@ -104,18 +101,6 @@ fn build_scene() -> Scene {
         radius: 0.5,
         material: light,
     });
-/*
-    let mut triangle = Triangle {
-        a: Vector3::new(2.4, 2.0, -0.1),
-        b: Vector3::new(2.4, 1.5, 0.4),
-        c: Vector3::new(2.0, 2.2, 0.4),
-        na: Vector3::new(0.0, 1.0, 0.0),
-        nb: Vector3::new(0.0, 1.0, 0.0),
-        nc: Vector3::new(0.0, 1.0, 0.0),
-        material: yellow,
-    };
-    // triangle.recalculate_normals();
-    scene.add_shape(triangle);*/
 
     scene
 }
@@ -206,6 +191,7 @@ fn render<I: Integrator + Clone, A: Accelerator>(integrator: I, input: RendererI
         let mut renderer = renderers.pop().unwrap();
         scope.spawn(move |_| {
             while let Steal::Success(tile) = queue.steal() {
+                println!("Rendering tile ({},{})", tile.x, tile.y);
                 unsafe {
                     renderer.render_tile(&input, &image, tile);
                 }
@@ -228,21 +214,22 @@ fn main() {
     println!("output path: {}", path);
 
     let scene = build_scene();
-    let accel = LinearAccelerator::new(&scene);
+    let accel = ShapeVec::new(&scene);
 
     let integrator = PathTracer::new(4);
     let input = RendererInput {
         scene: &scene,
         accel: &accel,
-        sample_count: 512,
-        width: 1024,
-        height: 512,
+        sample_count: 16,
+        width: 1920,
+        height: 960,
         tile_size: 64,
         thread_count: 16,
     };
 
     let image = render(integrator, input);
 
-    println!("saving");
-    image.save("test.png").unwrap();
+    let save_path = "test.png";
+    println!("saving as {}", save_path);
+    image.save(save_path).unwrap();
 }

@@ -5,10 +5,9 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 use std::cell::UnsafeCell;
-use crate::io::{hdr, Load};
 use std::alloc::handle_alloc_error;
 
-pub struct RgbaImage{
+pub struct RgbaImage {
     width: usize,
     height: usize,
     data: UnsafeCell<Vec<u8>>,
@@ -172,11 +171,5 @@ impl Image {
         data[offset + 0] = color.r;
         data[offset + 1] = color.g;
         data[offset + 2] = color.b;
-    }
-}
-
-impl Load for Image {
-    fn load<P: AsRef<Path>>(p: P) -> Result<Self> {
-        hdr::parse(p)
     }
 }
