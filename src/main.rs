@@ -35,11 +35,11 @@ fn build_scene() -> Scene {
     let up = Vector3::new(0.0, 1.0, 0.0);
     let fov = 90.0;
     let aspect_ratio = 2.0 / 1.0;
-    let camera = Camera::look_at(origin, at, up, fov, aspect_ratio);
 
-    let mut scene = Scene::new(camera);
+    let mut scene = Scene::new();
+    scene.camera = Camera::look_at(origin, at, up, fov, aspect_ratio);
 
-    scene.sky = Some(Hdr::load("spiaggia_di_mondello_4k.hdr").unwrap());
+    // scene.sky = Some(Hdr::load("spiaggia_di_mondello_4k.hdr").unwrap());
     // scene.sky = Some(load("blaubeuren_night_4k.hdr").unwrap());
     // scene.sky = Some(load("blaubeuren_night_4k.hdr").unwrap());
 
