@@ -28,13 +28,14 @@ use crate::random::*;
 use crate::scene::*;
 use crate::shape::*;
 use crossbeam_deque::{Injector, Steal};
+use std::time::Instant;
 
 fn build_scene() -> Scene {
     let origin = Vector3::new(-1.5, 9.0, 0.1);
     let at = Vector3::new(-1.5, 0.0, 0.0);
     let up = Vector3::new(0.0, 1.0, 0.0);
     let fov = 90.0;
-    let aspect_ratio = 2.0 / 1.0;
+    let aspect_ratio = 16.0 / 9.0;
 
     let mut scene = Scene::new();
     scene.camera = Camera::look_at(origin, at, up, fov, aspect_ratio);
@@ -222,12 +223,16 @@ fn main() {
         accel: &accel,
         sample_count: 16,
         width: 1920,
-        height: 960,
+        height: 1080,
         tile_size: 64,
-        thread_count: 16,
+        thread_count: 1,
     };
 
+    let render_start = Instant::now();
     let image = render(integrator, input);
+    let render_end = Instant::now();
+    let dt = render_end - render_start;
+    println!("rendering took {} ms", dt.as_millis());
 
     let save_path = "test.png";
     println!("saving as {}", save_path);

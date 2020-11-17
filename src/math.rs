@@ -11,8 +11,8 @@ pub use self::plane::*;
 pub use self::vector::*;
 pub use std::f64::{EPSILON, MAX, consts::*};
 
-// TODO: switch to float wrapper with nicer interface
 pub type Float = f64;
+pub type Float8 = wide::f32x8;
 
 pub fn cmp_float(a: &Float, b: &Float) -> std::cmp::Ordering {
     if a < b {
