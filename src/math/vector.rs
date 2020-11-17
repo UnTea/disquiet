@@ -125,3 +125,105 @@ impl IndexMut<Axis> for Vector3 {
         }
     }
 }
+
+pub struct Vector3x8 {
+    pub x: Float8,
+    pub y: Float8,
+    pub z: Float8,
+}
+
+impl Vector3x8 {
+    pub const ZERO: Vector3x8 = Vector3x8::new(Float8::ZERO, Float8::ZERO, Float8::ZERO);
+    pub const X: Vector3x8 = Vector3x8::new(Float8::ONE, Float8::ZERO, Float8::ZERO);
+    pub const Y: Vector3x8 = Vector3x8::new(Float8::ZERO, Float8::ONE, Float8::ZERO);
+    pub const Z: Vector3x8 = Vector3x8::new(Float8::ZERO, Float8::ZERO, Float8::ONE);
+
+    pub const fn new(x: Float8, y: Float8, z: Float8) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn dot(&self, rhs: Vector3x8) -> Float8 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub fn cross(&self, rhs: Vector3x8) -> Vector3x8 {
+        Vector3x8 {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
+
+    pub fn normalize(self) -> Vector3x8 {
+        let len = self.len();
+        self / len
+    }
+
+    pub fn len_squared(&self) -> Float8 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    pub fn len(&self) -> Float8 {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn min(&self, rhs: Vector3x8) -> Vector3x8 {
+        Vector3x8 {
+            x: self.x.min(rhs.x),
+            y: self.y.min(rhs.y),
+            z: self.z.min(rhs.z),
+        }
+    }
+
+    pub fn max(&self, rhs: Self) -> Self {
+        Vector3x8 {
+            x: self.x.max(rhs.x),
+            y: self.y.max(rhs.y),
+            z: self.z.max(rhs.z),
+        }
+    }
+
+    pub fn clamp(&self, min: Vector3x8, max: Vector3x8) -> Vector3x8 {
+        Vector3x8 {
+            x: self.x.clamp(min.x, max.x),
+            y: self.y.clamp(min.y, max.y),
+            z: self.z.clamp(min.z, max.z),
+        }
+    }
+}
+
+impl Add for Vector3x8 {
+    type Output = Vector3x8;
+    fn add(self, rhs: Vector3x8) -> Vector3x8 {
+        Vector3x8::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+
+impl Sub for Vector3x8 {
+    type Output = Vector3x8;
+    fn sub(self, rhs: Vector3x8) -> Vector3x8 {
+        Vector3x8::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl Mul<Float8> for Vector3x8 {
+    type Output = Vector3x8;
+    fn mul(self, rhs: Float8) -> Vector3x8 {
+        Vector3x8::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
+}
+
+impl Div<Float8> for Vector3x8 {
+    type Output = Vector3x8;
+    fn div(self, rhs: Float8) -> Vector3x8 {
+        let reciprocal = rhs.recip();
+        Vector3x8::new(self.x * reciprocal, self.y * reciprocal, self.z * reciprocal)
+    }
+}
+
+impl Neg for Vector3x8 {
+    type Output = Vector3x8;
+    fn neg(self) -> Vector3x8 {
+        Vector3x8::new(-self.x, -self.y, -self.z)
+    }
+}

@@ -14,6 +14,16 @@ pub use std::f64::{EPSILON, MAX, consts::*};
 pub type Float = f64;
 pub type Float8 = wide::f32x8;
 
+pub trait FloatExt : Sized {
+    fn clamp(self, min: Self, max: Self) -> Self;
+}
+
+impl FloatExt for Float8 {
+    fn clamp(self, min: Self, max: Self) -> Self {
+        self.min(max).max(min)
+    }
+}
+
 pub fn cmp_float(a: &Float, b: &Float) -> std::cmp::Ordering {
     if a < b {
         std::cmp::Ordering::Less
